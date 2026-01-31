@@ -1,14 +1,27 @@
-# PACT Examples
+# Pact Examples
 
-This repo contains the **runtime SDK**, **provider adapter**, and **examples** for integrating Pact into agents.
+This repository contains the **runtime SDK**, **provider adapter**, and **example workflows** for integrating Pact into agents.
 
-**Goal:** How devs integrate Pact into agents.
+Use this repo if you are:
 
----
+- Building agents that negotiate or settle
+- Running example flows
+- Emitting Pact transcripts for verification
+
+## What this repo is
+
+**Agent-side runtime + integrations.**
+
+This is where:
+
+- Negotiation logic runs
+- Policies are enforced
+- Settlements are attempted
+- Pact transcripts are generated
+
+Those transcripts are later verified by **pact-protocol**.
 
 ## Quickstart
-
-From the repo root:
 
 ```bash
 pnpm install --frozen-lockfile
@@ -16,26 +29,42 @@ pnpm -r test
 pnpm example:happy
 ```
 
----
+This runs a full agent flow and produces a Pact transcript under `.pact/transcripts/`.
 
 ## Directory map
 
-| Path | Description |
-|------|-------------|
-| `packages/sdk` | Runtime SDK: negotiation, policy, boundary, transcript store, replay |
-| `packages/provider-adapter` | Provider server and registry (demo provider) |
-| `examples/` | Example flows: basic-happy, timeout, dispute, reconcile, providers |
-
----
+| Path | Purpose |
+|------|---------|
+| `packages/sdk` | Runtime SDK (negotiation, policy, boundary, transcript store) |
+| `packages/provider-adapter` | Demo provider server + registry |
+| `examples/` | End-to-end flows (happy, timeout, dispute, reconcile, providers) |
 
 ## Minimal docs
 
-- **[How to run examples](./docs/examples/HOW_TO_RUN_EXAMPLES.md)** — Run example flows and tests
-- **[How to start demo provider](./docs/examples/HOW_TO_START_DEMO_PROVIDER.md)** — Start the demo provider server
-- **[How to verify with pact-protocol](./docs/examples/HOW_TO_VERIFY_WITH_PACT_PROTOCOL.md)** — Generate transcripts here and verify with the pact-protocol verifier (bridge between repos)
+- **How to run examples** — run flows and tests
+- **How to start demo provider** — run the provider server
+- **How to verify with pact-protocol** — pass transcripts to the offline verifier
 
----
+## Mental model
 
-For the **evidence standard and offline verifier** (schemas, verifier CLI, constitution, auditor packs), see **pact-protocol**.
+Pact splits agent systems into two layers:
 
-**Maintainers:** When building the pact-examples export from the monorepo, copy the current `packages/sdk`, `packages/provider-adapter`, `examples/`, and optionally `fixtures/` so the gate and tests pass; use the latest `packages/sdk` (including `src/__mocks__/` and updated `vitest.config.ts`) for passport-free test runs.
+- **Runtime (SDK):** agents negotiate, settle, and emit signed transcripts
+- **Protocol (Verifier):** an offline system verifies those transcripts, attributes blame, and produces audit-grade evidence
+
+Agents create evidence. Pact judges it.
+
+## How the repos fit together
+
+```
+pact-examples (this repo)
+  └─ runs agents
+  └─ produces transcripts
+
+pact-protocol
+  └─ verifies transcripts
+  └─ attributes blame
+  └─ produces audit artifacts
+```
+
+If you care about evidence, disputes, or verification, go to **pact-protocol**.
